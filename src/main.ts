@@ -1,34 +1,35 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable prettier/prettier */
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ValidationPipe } from './common/pipes/validation.pipe';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
-import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+import { swaggerConfig } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const configService = app.get(ConfigService);
+
+  const frontendUrl = configService.getOrThrow<string>('app.frontendUrl');
+
+  const apiPrefix = configService.getOrThrow<string>('app.apiPrefix');
+
+  const port = configService.getOrThrow<number>('app.port');
+
   app.enableCors({
-    origin: ['http://localhost:5173'],
+    origin: [frontendUrl],
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix(apiPrefix);
 
-  app.useGlobalFilters(new AllExceptionsFilter());
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new ResponseInterceptor(),
-    new TimeoutInterceptor(30000),
-    new AuditInterceptor(),
-  );
+  SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(port);
+
+  console.log(`Server running on http://localhost:${port}/${apiPrefix}`);
 }
 
 bootstrap();
