@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+//   url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  fullName      String
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  roles         UserRole[]
+  auditLogs     AuditLog[]
+}
+
+model Role {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+
+  users         UserRole[]
+}
+
+model UserRole {
+  userId        String
+  roleId        String
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          Role           @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model SemanticModel {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  content       Json
+  version       String
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model QueryExecution {
+  id            String         @id @default(uuid())
+  question      String
+  generatedSql  String?
+  executionTimeMs Int?
+  status        String?
+  resultRows    Int?
+  createdAt     DateTime       @default(now())
+}
+
+model AuditLog {
+  id            String         @id @default(uuid())
+  userId        String?
+  action        String
+  entity        String
+  entityId      String?
+  metadata      Json?
+  createdAt     DateTime       @default(now())
+
+  user          User?          @relation(fields: [userId], references: [id])
+}
+
+model BenchmarkRun {
+  id            String         @id @default(uuid())
+  modelName     String
+  score         Float
+  details       Json?
+  createdAt     DateTime       @default(now())
+}
