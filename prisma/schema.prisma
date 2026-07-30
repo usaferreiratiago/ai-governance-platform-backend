@@ -26,6 +26,8 @@ model Role {
   description   String?
 
   users         UserRole[]
+
+  rolePermissions RolePermission[]
 }
 
 model UserRole {
@@ -98,4 +100,26 @@ model GovernancePolicy {
   @@index([name])
   @@index([category])
   @@index([isActive])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+
+  @@index([name])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
 }
