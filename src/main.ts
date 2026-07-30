@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { swaggerConfig } from './config';
+import { Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,5 +34,12 @@ async function bootstrap() {
 
   console.log(`Server running on http://localhost:${port}/${apiPrefix}`);
 }
+
+const reflector = app.get(Reflector);
+
+app.useGlobalGuards(
+  new JwtAuthGuard(reflector),
+  new RolesGuard(reflector),
+);
 
 bootstrap();
