@@ -5,6 +5,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BenchmarksModule } from './modules/benchmarks/benchmarks.module';
 import { DashboardsModule } from './modules/dashboards/dashboards.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DashboardsModule } from './modules/dashboards/dashboards.module';
     AuditModule,
     BenchmarksModule,
     DashboardsModule,
+    HealthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: configuration,

@@ -83,3 +83,19 @@ model BenchmarkRun {
   details       Json?
   createdAt     DateTime       @default(now())
 }
+
+model GovernancePolicy {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String
+  version     String
+  isActive    Boolean  @default(true)
+  rules       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([category])
+  @@index([isActive])
+}
