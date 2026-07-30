@@ -32,3 +32,15 @@ export class AuditInterceptor implements NestInterceptor {
     );
   }
 }
+
+// constructor(private readonly auditService: AuditService) {}
+
+// await this.auditService.log({
+//   userId: user?.sub,
+//   action: method,
+//   entity: path,
+//   metadata: {
+//     ip: request.ip,
+//     userAgent: request.headers['user-agent'],
+//   },
+// });
